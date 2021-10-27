@@ -10,6 +10,9 @@ VR App/[Bb]uilds/
 VR App/[Ll]ogs/
 VR App/[Mm]emoryCaptures/
 
+# Unity Library & Package Data
+Library/
+
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
 
