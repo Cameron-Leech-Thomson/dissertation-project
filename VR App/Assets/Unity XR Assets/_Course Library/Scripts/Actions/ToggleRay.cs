@@ -15,6 +15,9 @@ public class ToggleRay : MonoBehaviour
     [Tooltip("The direct interactor that's switched to")]
     public XRDirectInteractor directInteractor = null;
 
+    [Tooltip("The ray belonging to the other controller")]
+    public ToggleRay offHandRay;
+
     private XRRayInteractor rayInteractor = null;
     private bool isSwitched = false;
 
@@ -31,7 +34,7 @@ public class ToggleRay : MonoBehaviour
 
     public void ActivateRay()
     {
-        if (!TouchingObject() || forceToggle)
+        if ((!TouchingObject() || forceToggle) && !offHandRay.isSwitched)
             SwitchInteractors(true);
     }
 
