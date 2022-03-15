@@ -30,7 +30,7 @@ public class ChangeText : MonoBehaviour
     public Units units = new Units();
 
     private float getSliderValue(){
-        return slider.value;
+        return ((float)Math.Round(slider.value, 2));
     }
 
     public void setText(string text){

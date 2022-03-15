@@ -14,12 +14,12 @@ public class PhysicsController : MonoBehaviour
     List<GameObject> physObjects = new List<GameObject>();
     float gravity = 9.8f;
     int speedOfLight = 300000000;
+    int doppler = 300000000;
 
     // Start is called before the first frame update
     void Start()
     {
         foreach(Transform child in physicsObjectsContainer.transform){
-            Debug.Log("Child Name: " + child.name);
             physObjects.Add(child.gameObject);
         }
     }
@@ -40,7 +40,14 @@ public class PhysicsController : MonoBehaviour
         speedOfLight = (int)physicsSliders.speedOfLightSlider.value;
 
         // ------------------------  DOPPLER SHIFT  ------------------------
+        doppler = (int)physicsSliders.dopplerShiftSlider.value;
 
+    }
+
+    public void resetValues(){
+        physicsSliders.gravitySlider.value = 9.81f;
+        physicsSliders.speedOfLightSlider.value = 300000000;
+        physicsSliders.dopplerShiftSlider.value = 300000000;
     }
 
     [Serializable]
