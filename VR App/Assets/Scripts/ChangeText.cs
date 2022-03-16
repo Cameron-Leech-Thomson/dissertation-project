@@ -21,7 +21,9 @@ public class ChangeText : MonoBehaviour
                 return "m/s²";
             } if (speedOfLight){
                 return "m/s";
-            } else {
+            } if (dopplerShift) {
+                return "";
+            } else{
                 return "";
             }
         }

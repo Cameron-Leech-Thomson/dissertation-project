@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class PhysicsController : MonoBehaviour
 {
@@ -12,13 +13,17 @@ public class PhysicsController : MonoBehaviour
     [Tooltip("Each slider belonging to the physics UI element.")]
     public PhysicsMenu physicsSliders = new PhysicsMenu();
     List<GameObject> physObjects = new List<GameObject>();
-    float gravity = 9.8f;
+    [Tooltip("Minimum tolerance to consider an object to be moving or not:")]
+    public float velocityThreshold = 0.05f;
+    Vector3 minVelocity;
+    float gravity = 9.81f;
     int speedOfLight = 300000000;
     int doppler = 300000000;
 
     // Start is called before the first frame update
     void Start()
     {
+        minVelocity = new Vector3(velocityThreshold, velocityThreshold, velocityThreshold);
         foreach(Transform child in physicsObjectsContainer.transform){
             physObjects.Add(child.gameObject);
         }
@@ -38,21 +43,35 @@ public class PhysicsController : MonoBehaviour
         }
 
         // ------------------------  SPEED OF LIGHT  ------------------------
+        
         speedOfLight = (int)physicsSliders.speedOfLightSlider.value;
 
         foreach(GameObject physObj in physObjects){
-            // Get the rigidbody components of the physics objects:
-            Rigidbody rb = physObj.GetComponent<Rigidbody>();
-            // Get the rest values of the object from the ValuesAtRest script:
-            ValuesAtRest restVals = physObj.GetComponent<ValuesAtRest>();
-
-            // Set mass to relativistic mass:
-            rb.mass = getRelativeMass(rb, restVals);
-        }
+            // Only affect the object if it isn't being held, or isn't moving:
+            if (!physObj.GetComponent<XRGrabInteractable>().isSelected || 
+                physObj.GetComponent<Rigidbody>().velocity.magnitude > minVelocity.magnitude){
+                // Get the rigidbody components of the physics objects:
+                Rigidbody rb = physObj.GetComponent<Rigidbody>();
+                // Get the rest values of the object from the ValuesAtRest script:
+                ValuesAtRest restVals = physObj.GetComponent<ValuesAtRest>();
+                if (!rb.IsSleeping()){
+                    // Set mass to relativistic mass:
+                    rb.mass = getRelativeMass(rb, restVals);
+                    // Set size to relativistic size:
+                    setScale(physObj, getRelativeSize(rb, restVals));
+                }
+            }
+        } 
 
         // ------------------------  DOPPLER SHIFT  ------------------------
         doppler = (int)physicsSliders.dopplerShiftSlider.value;
 
+    }
+
+    private void setScale(GameObject obj, Vector3 scale){
+        obj.transform.parent = null;
+        obj.transform.localScale = scale;
+        obj.transform.parent = physicsObjectsContainer.transform;
     }
 
     private float getRelativeMass(Rigidbody rb, ValuesAtRest restVals) {
@@ -62,9 +81,26 @@ public class PhysicsController : MonoBehaviour
         float restMass = restVals.getRestMass();
 
         // Calculate relativistic mass:
-        float relativeMass = restMass / (float)(Math.Sqrt(1 - (square(velocity) / square(speedOfLight))));
+        float relativeMass = restMass / (float)(Math.Sqrt(Math.Abs(1 - (square(velocity) / square(speedOfLight)))));
 
         return relativeMass;
+    }
+
+    private Vector3 getRelativeSize(Rigidbody rb, ValuesAtRest restVals){
+        // Get velocity:
+        Vector3 velocity = rb.velocity;
+        // Get the rest length:
+        Vector3 restLength = restVals.getRestLength();
+
+        Vector3 relativeSize = new Vector3(lorentzCalculation(velocity.x, restLength.x),
+                                           lorentzCalculation(velocity.y, restLength.y),
+                                           lorentzCalculation(velocity.z, restLength.z));
+        
+        return relativeSize;
+    }
+
+    private float lorentzCalculation(float vel, float len){
+        return len * (float)Math.Sqrt(Math.Abs(1 - (square(vel) / square(speedOfLight))));
     }
 
     private float square(float val){
@@ -84,7 +120,7 @@ public class PhysicsController : MonoBehaviour
         } if (target.Equals(physicsSliders.speedOfLightSlider)){
             physicsSliders.gravitySlider.value = 9.81f;
             physicsSliders.dopplerShiftSlider.value = 300000000;
-        } else {
+        } if (target.Equals(physicsSliders.dopplerShiftSlider)) {
             physicsSliders.gravitySlider.value = 9.81f;
             physicsSliders.speedOfLightSlider.value = 300000000;
         }
