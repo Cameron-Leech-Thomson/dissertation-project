@@ -44,6 +44,7 @@ public class PhysicsController : MonoBehaviour
             // Get the rigidbody components of the physics objects:
             Rigidbody rb = physObj.GetComponent<Rigidbody>();
             // Get the rest values of the object from the ValuesAtRest script:
+            ValuesAtRest restVals = physObj.GetComponent<ValuesAtRest>();
 
             // Set mass to relativistic mass:
             rb.mass = getRelativeMass(rb, restVals);
