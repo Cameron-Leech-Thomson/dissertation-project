@@ -27,6 +27,7 @@ public class PhysicsController : MonoBehaviour
     void FixedUpdate() {
         // ------------------------  GRAVITY  ------------------------
         gravity = physicsSliders.gravitySlider.value;
+
         foreach(GameObject physObj in physObjects){
             // Get the rigidbody component of the physics objects:
             Rigidbody rb = physObj.GetComponent<Rigidbody>();
@@ -39,15 +40,53 @@ public class PhysicsController : MonoBehaviour
         // ------------------------  SPEED OF LIGHT  ------------------------
         speedOfLight = (int)physicsSliders.speedOfLightSlider.value;
 
+        foreach(GameObject physObj in physObjects){
+            // Get the rigidbody components of the physics objects:
+            Rigidbody rb = physObj.GetComponent<Rigidbody>();
+            // Get the rest values of the object from the ValuesAtRest script:
+
+            // Set mass to relativistic mass:
+            rb.mass = getRelativeMass(rb, restVals);
+        }
+
         // ------------------------  DOPPLER SHIFT  ------------------------
         doppler = (int)physicsSliders.dopplerShiftSlider.value;
 
+    }
+
+    private float getRelativeMass(Rigidbody rb, ValuesAtRest restVals) {
+        // Get velocity & convert to a single value:
+        float velocity = rb.velocity.magnitude;
+        // Get the rest mass of the object:
+        float restMass = restVals.getRestMass();
+
+        // Calculate relativistic mass:
+        float relativeMass = restMass / (float)(Math.Sqrt(1 - (square(velocity) / square(speedOfLight))));
+
+        return relativeMass;
+    }
+
+    private float square(float val){
+        return val * val;
     }
 
     public void resetValues(){
         physicsSliders.gravitySlider.value = 9.81f;
         physicsSliders.speedOfLightSlider.value = 300000000;
         physicsSliders.dopplerShiftSlider.value = 300000000;
+    }
+
+    public void resetOthers(Slider target){
+        if (target.Equals(physicsSliders.gravitySlider)){
+            physicsSliders.speedOfLightSlider.value = 300000000;
+            physicsSliders.dopplerShiftSlider.value = 300000000;
+        } if (target.Equals(physicsSliders.speedOfLightSlider)){
+            physicsSliders.gravitySlider.value = 9.81f;
+            physicsSliders.dopplerShiftSlider.value = 300000000;
+        } else {
+            physicsSliders.gravitySlider.value = 9.81f;
+            physicsSliders.speedOfLightSlider.value = 300000000;
+        }
     }
 
     [Serializable]
@@ -57,6 +96,7 @@ public class PhysicsController : MonoBehaviour
         public Slider speedOfLightSlider;
 
         public Slider dopplerShiftSlider;
+
     }
 
 }
