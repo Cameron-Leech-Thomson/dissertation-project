@@ -15,6 +15,8 @@ public class PhysicsController : MonoBehaviour
     List<GameObject> physObjects = new List<GameObject>();
     [Tooltip("Minimum tolerance to consider an object to be moving or not:")]
     public float velocityThreshold = 0.05f;
+    [Tooltip("Multiplier to make the value of gravity feel more floaty")]
+    public float gravityMultiplier = 0.75f;
     Vector3 minVelocity;
     float gravity = 9.81f;
     int speedOfLight = 300000000;
@@ -39,7 +41,7 @@ public class PhysicsController : MonoBehaviour
             // Set gravity to false so we can add our custom force of gravity:
             rb.useGravity = false;
             // Add custom gravity force:
-            rb.AddForce(new Vector3(0, -1.0f, 0) * rb.mass * gravity);
+            rb.AddForce(new Vector3(0, -1.0f, 0) * rb.mass * gravity * gravityMultiplier);
         }
 
         // ------------------------  SPEED OF LIGHT  ------------------------
