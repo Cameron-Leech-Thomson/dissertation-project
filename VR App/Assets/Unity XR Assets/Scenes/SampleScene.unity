@@ -1643,6 +1643,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6984d906f211ab4782440451956c880, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &310866506 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5971354627862412501, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+  m_PrefabInstance: {fileID: 720299452}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310866502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9469e5ef7ce252d48a689ad38d7b5695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &313957233
 GameObject:
   m_ObjectHideFlags: 0
@@ -2984,6 +2995,57 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 499115114}
   m_CullTransparentMesh: 1
+--- !u!1 &501824749 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5971354627901875194, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+  m_PrefabInstance: {fileID: 720299452}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &501824755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 501824749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a8d337e8bc7ac4498e0df29e7b8bd5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: fbebb051-ab27-44d4-a8af-a89e584b646b
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 274e184c-2308-444c-8cd1-5048e5fcbd4a
+      m_Path: <XRController>{RightHand}/secondaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 310866506}
+        m_TargetAssemblyTypeName: TeleportPlayer, Assembly-CSharp
+        m_MethodName: Teleport
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &506874310
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3858,7 +3920,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_InteractionManager: {fileID: 1694511802}
-  m_Colliders: []
+  m_Colliders:
+  - {fileID: 1939131335}
   m_InteractionLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -3917,7 +3980,7 @@ MonoBehaviour:
   m_TeleportationProvider: {fileID: 760450276}
   m_MatchOrientation: 2
   m_TeleportTrigger: 0
-  m_TeleportAnchorTransform: {fileID: 627074011}
+  m_TeleportAnchorTransform: {fileID: 1939131334}
 --- !u!1 &665682426
 GameObject:
   m_ObjectHideFlags: 0
@@ -4149,6 +4212,10 @@ PrefabInstance:
       propertyPath: m_Reticle
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 5971354626159750724, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+      propertyPath: m_SmoothMovement
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5971354626159750728, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
       propertyPath: offHandRay
       value: 
@@ -4160,6 +4227,10 @@ PrefabInstance:
     - target: {fileID: 5971354626800100552, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
       propertyPath: m_Reticle
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5971354626800100552, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+      propertyPath: m_SmoothMovement
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5971354626800100556, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
       propertyPath: offHandRay
@@ -4216,6 +4287,38 @@ PrefabInstance:
     - target: {fileID: 5971354627862412497, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5971354627862412501, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+      propertyPath: anchor
+      value: 
+      objectReference: {fileID: 627074016}
+    - target: {fileID: 5971354627901875198, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+      propertyPath: OnRelease.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5971354627901875198, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+      propertyPath: OnRelease.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5971354627901875198, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+      propertyPath: OnRelease.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5971354627901875198, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+      propertyPath: OnRelease.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5971354627901875198, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+      propertyPath: OnRelease.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5971354627901875198, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+      propertyPath: OnRelease.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: ToggleRay, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5971354627901875198, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
+      propertyPath: OnRelease.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5f7af6b0f0464d6498f2a1c837d04c4c, type: 3}
@@ -7820,8 +7923,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1939131334}
+  - component: {fileID: 1939131335}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Anchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7841,6 +7945,19 @@ Transform:
   m_Father: {fileID: 627074011}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1939131335
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1939131333}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1945578417
 PrefabInstance:
   m_ObjectHideFlags: 0
