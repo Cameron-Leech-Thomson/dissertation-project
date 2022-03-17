@@ -31,8 +31,13 @@ public class ChangeText : MonoBehaviour
 
     public Units units = new Units();
 
-    private float getSliderValue(){
-        return ((float)Math.Round(slider.value, 2));
+    private string getSliderValue(){
+        if (units.speedOfLight){
+            return slider.value.ToString(new string('#', 339));
+        } else{
+            return Math.Round(slider.value, 2).ToString();
+        }
+        
     }
 
     public void setText(string text){

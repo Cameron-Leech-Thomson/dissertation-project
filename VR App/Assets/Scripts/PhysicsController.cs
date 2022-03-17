@@ -10,9 +10,12 @@ public class PhysicsController : MonoBehaviour
 
     [Tooltip("The parent object containing all dynamic physics objects.")]
     public GameObject physicsObjectsContainer;
+
     [Tooltip("Each slider belonging to the physics UI element.")]
     public PhysicsMenu physicsSliders = new PhysicsMenu();
+
     List<GameObject> physObjects = new List<GameObject>();
+
     [Tooltip("Minimum tolerance to consider an object to be moving or not:")]
     public float velocityThreshold = 0.05f;
     [Tooltip("Multiplier to make the value of gravity feel more floaty")]
@@ -94,15 +97,24 @@ public class PhysicsController : MonoBehaviour
         // Get the rest length:
         Vector3 restLength = restVals.getRestLength();
 
-        Vector3 relativeSize = new Vector3(lorentzCalculation(velocity.x, restLength.x),
-                                           lorentzCalculation(velocity.y, restLength.y),
-                                           lorentzCalculation(velocity.z, restLength.z));
+        Vector3 relativeSize = new Vector3(lorentzCalculation(Math.Abs(velocity.x), restLength.x),
+                                           lorentzCalculation(Math.Abs(velocity.y), restLength.y),
+                                           lorentzCalculation(Math.Abs(velocity.z), restLength.z));
         
         return relativeSize;
     }
 
+    // TODO: lorentz contractions go the opposite way, making them stretch outwards rather than inwards!
+    // NOTE: its when vel > c...
     private float lorentzCalculation(float vel, float len){
-        return len * (float)Math.Sqrt(Math.Abs(1 - (square(vel) / square(speedOfLight))));
+        float lorentzFactor;
+        // If the lorentz factor would be greater than 1:
+        if (vel > speedOfLight){
+            lorentzFactor = 0.9999f;
+        } else{
+            lorentzFactor = square(vel) / square(speedOfLight);
+        }
+        return len * (float)Math.Sqrt(Math.Abs(1 - lorentzFactor));
     }
 
     private float square(float val){
