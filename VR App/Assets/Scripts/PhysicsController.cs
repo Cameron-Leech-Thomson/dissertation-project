@@ -121,6 +121,11 @@ public class PhysicsController : MonoBehaviour
         return val * val;
     }
 
+    public float[] getValues(){
+        float[] vals = {gravity, speedOfLight, doppler};
+        return vals;
+    }
+
     public void resetValues(){
         physicsSliders.gravitySlider.value = 9.81f;
         physicsSliders.speedOfLightSlider.value = 300000000;
