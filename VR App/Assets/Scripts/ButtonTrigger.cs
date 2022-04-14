@@ -15,6 +15,10 @@ public class ButtonTrigger : MonoBehaviour
     [Tooltip("Force required to activate the button")]
     public float forceRequired = 12f;
 
+    [Tooltip("Whether or not the button can be used multiple times")]
+    public bool oneTimeUse = false;
+    bool activated = false;
+
     [Tooltip("The game object(s) that will be activated once this button has been pressed")]
     public GameObject[] activates;
 
@@ -36,20 +40,21 @@ public class ButtonTrigger : MonoBehaviour
 
     public void OnCollisionEnter(Collision collisionInfo)
     {
-        // Get object that is interacting with the button:
-        GameObject dynObject = collisionInfo.gameObject;
-        Debug.Log("Collision With " + dynObject.name.ToString());
-        // Check if the object colliding with the button is a valid interactable:
-        if (dynObject.GetComponent<XRGrabInteractable>() != null){
-            // Get the rigidbody belonging to the dynamic object:
-            Rigidbody rb = dynObject.GetComponent<Rigidbody>();
-            // Calculate the downward force it is exerting:
-            float gravity = physics.getValues()[0];
-            float downForce = rb.mass * gravity * physics.gravityMultiplier;
-            Debug.Log("Downforce: " + downForce.ToString());
+        if (!activated){
+            // Get object that is interacting with the button:
+            GameObject dynObject = collisionInfo.gameObject;
+            // Check if the object colliding with the button is a valid interactable:
+            if (dynObject.GetComponent<XRGrabInteractable>() != null){
+                // Get the rigidbody belonging to the dynamic object:
+                Rigidbody rb = dynObject.GetComponent<Rigidbody>();
+                // Calculate the downward force it is exerting:
+                float gravity = physics.getValues()[0];
+                float downForce = rb.mass * gravity * physics.gravityMultiplier;
 
-            if (downForce > forceRequired){
-                activateButton();
+                if (downForce > forceRequired){
+					activated = true;
+                    activateButton();
+                }
             }
         }
     }
@@ -58,13 +63,25 @@ public class ButtonTrigger : MonoBehaviour
         // Move the button down:
         StartCoroutine(LerpPosition(buttonDown, 3));
 
-        Debug.Log("Activated!");
+		/* TODO: Call the activate command of whatever it is connected to.
+			Need to check if it needs to be activated or deactivated.
+		*/
+		foreach (GameObject obj in activates){
+			// Get the activator component of the object:
+			Activatable activator = obj.GetComponent<Activatable>();
+			if (activator != null){
+				activator.activate();
+			}
+		}
     }
 
     public void OnCollisionExit(Collision collisionInfo)
     {
-        // Set button back to original position:
-        StartCoroutine(LerpPosition(buttonUp, 3));
+        // Set button back to original position if the button is to be moved again:
+        if (!oneTimeUse){
+            StartCoroutine(LerpPosition(buttonUp, 3));
+			activated = false;
+        }
     }
 
     IEnumerator LerpPosition(Vector3 targetPosition, float duration)
