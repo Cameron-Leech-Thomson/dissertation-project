@@ -6,15 +6,15 @@ public class ValuesAtRest : MonoBehaviour
 {
     
     [Tooltip ("Mass of object at a standstill")]
-    public float restMass;
+    float restMass;
     Vector3 restLength;
 
     void Start() {
         // Get rigidbody component:
         Rigidbody rb = gameObject.GetComponent<Rigidbody>();
 
-        // Set mass to rest values:
-        rb.mass = restMass;
+        // Get rest mass from Rigidbody vals:
+        restMass = rb.mass;
 
         // Get relative size of the object from its starting transform:
         restLength = gameObject.transform.lossyScale;

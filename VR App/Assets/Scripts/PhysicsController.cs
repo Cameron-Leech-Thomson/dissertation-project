@@ -104,12 +104,10 @@ public class PhysicsController : MonoBehaviour
         return relativeSize;
     }
 
-    // TODO: lorentz contractions go the opposite way, making them stretch outwards rather than inwards!
-    // NOTE: its when vel > c...
     private float lorentzCalculation(float vel, float len){
         float lorentzFactor;
         // If the lorentz factor would be greater than 1:
-        if (vel > speedOfLight){
+        if (vel >= speedOfLight){
             lorentzFactor = 0.9999f;
         } else{
             lorentzFactor = square(vel) / square(speedOfLight);
@@ -133,15 +131,18 @@ public class PhysicsController : MonoBehaviour
     }
 
     public void resetOthers(Slider target){
-        if (target.Equals(physicsSliders.gravitySlider)){
-            physicsSliders.speedOfLightSlider.value = 300000000;
-            physicsSliders.dopplerShiftSlider.value = 300000000;
-        } if (target.Equals(physicsSliders.speedOfLightSlider)){
-            physicsSliders.gravitySlider.value = 9.81f;
-            physicsSliders.dopplerShiftSlider.value = 300000000;
-        } if (target.Equals(physicsSliders.dopplerShiftSlider)) {
-            physicsSliders.gravitySlider.value = 9.81f;
-            physicsSliders.speedOfLightSlider.value = 300000000;
+        // Reset maximum value if it has been reduced:
+        if(!target.Equals(physicsSliders.speedOfLightSlider)){
+            physicsSliders.speedOfLightSlider.maxValue = 300000000f;
+        }
+
+        float[] defaults = {9.81f, 300000000f, 300000000f};
+        Slider[] sliders = physicsSliders.GetSliders();
+        for (int i = 0; i < defaults.Length; i++)
+        {
+            if (!target.Equals(sliders[i])){
+                sliders[i].value = defaults[i];
+            }
         }
     }
 
@@ -152,6 +153,10 @@ public class PhysicsController : MonoBehaviour
         public Slider speedOfLightSlider;
 
         public Slider dopplerShiftSlider;
+
+        public Slider[] GetSliders(){
+            return new Slider[] {gravitySlider, speedOfLightSlider, dopplerShiftSlider};
+        }
 
     }
 

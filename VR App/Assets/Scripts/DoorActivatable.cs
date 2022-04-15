@@ -24,32 +24,19 @@ public class DoorActivatable : MonoBehaviour, Activatable
     }
 
     public bool isActive(){
-        return false;
+        return isActivated;
     }
 
     public void activate(){
         // TODO: activate door.
-        StartCoroutine(LerpPosition(doorOpen, 5));
+        StartCoroutine(LerpPosition.LerpPos(door.transform, doorOpen, 5));
         isActivated = true;
     }
 
     public void deactivate(){
         // TODO: deactivate door.
-        StartCoroutine(LerpPosition(doorClosed, 5));
+        StartCoroutine(LerpPosition.LerpPos(door.transform, doorClosed, 5));
         isActivated = false;
-    }
-
-    IEnumerator LerpPosition(Vector3 targetPosition, float duration)
-    {
-        float time = 0;
-        Vector3 startPosition = door.transform.position;
-        while (time < duration)
-        {
-            door.transform.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
-            time += Time.deltaTime;
-            yield return null;
-        }
-        door.transform.position = targetPosition;
     }
 
 }
