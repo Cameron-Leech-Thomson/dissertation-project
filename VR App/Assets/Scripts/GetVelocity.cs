@@ -13,7 +13,7 @@ public class GetVelocity : MonoBehaviour
         // Get object that is interacting with the trigger:
         GameObject dynObject = collisionInfo.gameObject;
         // Check if the object is a valid interactable:
-        if (dynObject.GetComponent<XRGrabInteractable>() != null || dynObject.Equals(transform.parent.gameObject)){
+        if (dynObject.GetComponent<XRGrabInteractable>() != null){
             Debug.Log("Triggered by " + dynObject.name);
             Rigidbody rb = dynObject.GetComponent<Rigidbody>();
             velocity = rb.velocity;

@@ -35,7 +35,7 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
         cb.Initalize(this);
 
         buttonUp = buttonSwitch.transform.position;
-        buttonDown = buttonUp - new Vector3(0, 0.045f, 0);
+        buttonDown = buttonUp - (new Vector3(0, 0.05f, 0) * transform.lossyScale.y);
     }
 
     public void OnCollisionEnter(Collision collisionInfo)

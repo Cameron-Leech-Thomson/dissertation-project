@@ -36,8 +36,11 @@ public class WallButtonTrigger : MonoBehaviour, ButtonTrigger
         ColliderBridge cb = buttonCollider.gameObject.AddComponent<ColliderBridge>();
         cb.Initalize(this);
 
-        buttonUp = buttonSwitch.transform.position;
-        buttonDown = buttonUp - multiplyVectors(new Vector3(0.045f, 0, 0.45f), buttonSwitch.transform.up);
+        Vector3 offsetVector = new Vector3(0.05f, 0.0f, 0.05f) * transform.lossyScale.y;
+
+        Transform buttonTransform = buttonSwitch.transform;
+        buttonUp = buttonTransform.position;
+        buttonDown = buttonUp - multiplyVectors(offsetVector, buttonSwitch.transform.up);
 
         getVel = GetComponentInChildren<GetVelocity>();
     }
