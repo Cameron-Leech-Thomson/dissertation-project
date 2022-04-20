@@ -22,7 +22,7 @@ public class ChangeText : MonoBehaviour
             } if (speedOfLight){
                 return "m/s";
             } if (dopplerShift) {
-                return "";
+                return "%";
             } else{
                 return "";
             }

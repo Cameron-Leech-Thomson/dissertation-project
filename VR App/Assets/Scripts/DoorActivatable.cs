@@ -28,13 +28,11 @@ public class DoorActivatable : MonoBehaviour, Activatable
     }
 
     public void activate(){
-        // TODO: activate door.
         StartCoroutine(LerpPosition.LerpPos(door.transform, doorOpen, 5));
         isActivated = true;
     }
 
     public void deactivate(){
-        // TODO: deactivate door.
         StartCoroutine(LerpPosition.LerpPos(door.transform, doorClosed, 5));
         isActivated = false;
     }

@@ -1,13 +1,16 @@
 using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.UI;
 
 public class LaunchObject : MonoBehaviour
 {
     
     XRDirectInteractor interactor;
     public XRInteractionManager interactionManager;
+
+    public Slider powerBar;
 
     public bool isSelected = false;
     public bool isAiming = false;
@@ -18,15 +21,22 @@ public class LaunchObject : MonoBehaviour
 
     void Start() {
         interactor = GetComponent<XRDirectInteractor>();
+        powerBar.value = 0;
+        powerBar.maxValue = maximumPower;
+        powerBar.gameObject.SetActive(false);
     }
 
     void LateUpdate() {
         if (isSelected && isAiming){
+            powerBar.gameObject.SetActive(true);
             if (currentPower <= maximumPower){
-                currentPower += 1;
+                currentPower += 0.25f;
+                powerBar.value = currentPower;
             }
         } else{
             currentPower = 0;
+            powerBar.value = currentPower;
+            powerBar.gameObject.SetActive(false);
         }
     }
 
@@ -40,16 +50,30 @@ public class LaunchObject : MonoBehaviour
 
     public void fire(){
         if (interactor.isSelectActive){
+            powerBar.gameObject.SetActive(false);
             // Get the interactable that is currently selected:
             XRBaseInteractable heldItem = interactor.selectTarget;
             interactor.allowSelect = false;
             // Deselect the interactable before launching:
-            interactionManager.SelectExit(interactor, heldItem);
+            try{
+                // Try to deselect the object:
+                interactionManager.SelectExit(interactor, heldItem);
+            } catch(NullReferenceException){
+                // In the case that the user has already let go and a NullReferenceException is thrown,
+                // return the users ability to select:
+                StartCoroutine(resetSelect());
+                return;
+            }
             
             Rigidbody rb = heldItem.gameObject.GetComponent<Rigidbody>();
 
+            float offset = Mathf.Abs(Mathf.Log(rb.mass));
+            if (offset == 0){
+                offset = 1.5f;
+            }
+
             Vector3 fwdVector = gameObject.transform.forward;
-            rb.AddForce(fwdVector * (currentPower / Mathf.Log(rb.mass)), ForceMode.VelocityChange);
+            rb.AddForce(fwdVector * (currentPower / offset), ForceMode.VelocityChange);
 
             StartCoroutine(resetSelect());
 

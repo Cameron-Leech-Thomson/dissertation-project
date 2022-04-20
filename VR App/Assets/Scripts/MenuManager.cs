@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
-public class UIManager : MonoBehaviour{
+public class MenuManager : MonoBehaviour{
 
     [Tooltip("All children UI elements")]
     public GameObject[] uiElements;

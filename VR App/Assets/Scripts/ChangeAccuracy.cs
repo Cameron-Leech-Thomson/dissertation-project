@@ -24,6 +24,7 @@ public class ChangeAccuracy : MonoBehaviour
             slider.value = 100;
         } else{
             slider.maxValue = 300000000;
+            slider.value = 300000000;
         }
     }
 
