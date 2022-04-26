@@ -94,12 +94,12 @@ public class WallButtonTrigger : MonoBehaviour, ButtonTrigger
             Need to check if it needs to be activated or deactivated.
         */
         foreach (GameObject obj in activates){
-            // Get the activator component of the object:
+			// Get the activator component of the object:
             Activatable activator = obj.GetComponent<Activatable>();
-            if (activator != null){
-                activator.activate();
-            }
-        }
+			if (activator != null){
+				activator.activate();
+			}
+		}
     }
 
     public void OnCollisionExit(Collision collisionInfo) {

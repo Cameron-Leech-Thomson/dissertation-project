@@ -68,7 +68,7 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
 		*/
 		foreach (GameObject obj in activates){
 			// Get the activator component of the object:
-			Activatable activator = obj.GetComponent<Activatable>();
+            Activatable activator = obj.GetComponent<Activatable>();
 			if (activator != null){
 				activator.activate();
 			}

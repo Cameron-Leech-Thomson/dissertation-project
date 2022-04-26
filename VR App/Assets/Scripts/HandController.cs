@@ -22,4 +22,9 @@ public class HandController : MonoBehaviour
         hand.SetGrip(controller.selectAction.action.ReadValue<float>());
         hand.SetTrigger(controller.activateAction.action.ReadValue<float>());
     }
+
+    public void resetValues(){
+        hand.SetGrip(0f);
+        hand.SetTrigger(0f);
+    }
 }

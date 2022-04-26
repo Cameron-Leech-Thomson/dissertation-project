@@ -15,7 +15,7 @@ public class LaunchObject : MonoBehaviour
     public bool isSelected = false;
     public bool isAiming = false;
 
-    public float maximumPower = 10;
+    public float maximumPower = 20f;
 
     float currentPower = 0;
 
@@ -30,7 +30,7 @@ public class LaunchObject : MonoBehaviour
         if (isSelected && isAiming){
             powerBar.gameObject.SetActive(true);
             if (currentPower <= maximumPower){
-                currentPower += 0.25f;
+                currentPower += 0.5f;
                 powerBar.value = currentPower;
             }
         } else{

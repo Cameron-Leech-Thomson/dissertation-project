@@ -9,15 +9,23 @@ public class ValuesAtRest : MonoBehaviour
     float restMass;
     Vector3 restLength;
 
+    Transform restPos;
+
     Renderer[] renderers;
-    Color[] colours;
+    Color defaultSpecular = Color.HSVToRGB(0f, 0f, 0.2f);
 
     MaterialPropertyBlock materialPropertyBlock;
 
     bool colourChanged = false;
 
+    private string specularID = "_SpecColor";
+    private string specularBool = "_SPECULARHIGHLIGHTS_OFF";
+    private string specularHighlights = "_SpecularHighlights";
+
     void Start() {
         materialPropertyBlock = new MaterialPropertyBlock();
+        // Get starting position of object in case it needs to be reset:
+        restPos = gameObject.transform;
         // Get rigidbody component:
         Rigidbody rb = gameObject.GetComponent<Rigidbody>();
 
@@ -29,12 +37,15 @@ public class ValuesAtRest : MonoBehaviour
 
         // Get the data from each material in the object:
         renderers = gameObject.GetComponentsInChildren<Renderer>();
-        colours = new Color[renderers.Length];
 
-        for (int i = 0; i < renderers.Length; i++)
-        {
-            colours[i] = renderers[i].material.color;
+        foreach(Renderer rend in renderers){
+            rend.material.DisableKeyword(specularBool);
         }
+    }
+
+    public void resetPosition(){
+        gameObject.transform.position = restPos.position;
+        gameObject.transform.rotation = restPos.rotation;
     }
 
     public bool isColourChanged(){
@@ -47,36 +58,39 @@ public class ValuesAtRest : MonoBehaviour
     }
 
     public void setColour(Color col){
-        if (!materialPropertyBlock.isEmpty){
-            materialPropertyBlock.Clear();
-            // Set the colour to the MPB:
-            materialPropertyBlock.SetColor("_BaseColor", col);
-            // Apply the propertyBlock to the renderers:
-            foreach(Renderer rend in renderers){
-                rend.SetPropertyBlock(materialPropertyBlock);
-            }
-            materialPropertyBlock.Clear();
-            colourChanged = true;
+        materialPropertyBlock.Clear();
+        // Set the colour to the MPB:
+        materialPropertyBlock.SetFloat(specularHighlights, 1f); 
+        materialPropertyBlock.SetColor(specularID, col);
+        float h, s, v = 0;
+        Color.RGBToHSV(materialPropertyBlock.GetColor(specularID), out h, out s, out v);
+        // string colVal = "(" + h + ", " + s + ", + " + v +")";
+        // Apply the propertyBlock to the renderers:
+        foreach(Renderer rend in renderers){
+            // Debug.Log("Setting " + rend.gameObject.name + " - " + specularID + " - to HSV: " + colVal);
+            rend.SetPropertyBlock(materialPropertyBlock);
         }
+        colourChanged = true;
     }
 
     public void resetColours(){
-        if (!materialPropertyBlock.isEmpty){
-            materialPropertyBlock.Clear();
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                // Set the colour to the MPB:
-                materialPropertyBlock.SetColor("_BaseColor", colours[i]);
-                // Apply the property to the renderer:
-                renderers[i].SetPropertyBlock(materialPropertyBlock);
-            }
-            materialPropertyBlock.Clear();
-            colourChanged = false;
+        materialPropertyBlock.Clear();
+        // Set the colour to the MPB:
+        materialPropertyBlock.SetFloat(specularHighlights, 1f); 
+        materialPropertyBlock.SetColor(specularID, defaultSpecular);
+        float h, s, v = 0;
+        Color.RGBToHSV(materialPropertyBlock.GetColor(specularID), out h, out s, out v);
+        // string colVal = "(" + h + ", " + s + ", + " + v +")";
+        foreach(Renderer rend in renderers){
+            // Apply the property to the renderer:
+            // Debug.Log("Re-Setting " + rend.gameObject.name + " - " + specularID + " - to HSV: " + colVal);
+            rend.SetPropertyBlock(materialPropertyBlock);
         }
+        colourChanged = false;
     }
 
-    public Color[] getStartColours(){
-        return colours;
+    public Color getStartColour(){
+        return defaultSpecular;
     }
 
     public Vector3 getRestLength(){

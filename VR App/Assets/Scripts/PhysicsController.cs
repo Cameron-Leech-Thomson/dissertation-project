@@ -14,6 +14,9 @@ public class PhysicsController : MonoBehaviour
     [Tooltip("The player's XR Rig")]
     public GameObject playerRig;
 
+    [Tooltip("The minimum height an object can be at before it is returned to it's starting position")]
+    public float minimuimHeight = -10f;
+
     [Tooltip("Each slider belonging to the physics UI element.")]
     public PhysicsMenu physicsSliders = new PhysicsMenu();
 
@@ -29,6 +32,8 @@ public class PhysicsController : MonoBehaviour
 
     float dist;
 
+    private bool isStarted = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +41,7 @@ public class PhysicsController : MonoBehaviour
             physObjects.Add(child.gameObject);
             child.gameObject.AddComponent<ValuesAtRest>();
         }
+        isStarted = true;
     }
 
     void FixedUpdate() {
@@ -45,82 +51,89 @@ public class PhysicsController : MonoBehaviour
 
         doppler = (int)physicsSliders.dopplerShiftSlider.value;
 
-        foreach(GameObject physObj in physObjects){
+        if (isStarted){
+            foreach(GameObject physObj in physObjects){
 
-            // ------------------------  GRAVITY  ------------------------
-
-            // Get the rigidbody component of the physics objects:
-            Rigidbody rb = physObj.GetComponent<Rigidbody>();
-            // Set gravity to false so we can add our custom force of gravity:
-            rb.useGravity = false;
-            // Add custom gravity force:
-            rb.AddForce(new Vector3(0, -1.0f, 0) * rb.mass * gravity * gravityMultiplier);
-
-            // ------------------------  SPEED OF LIGHT  ------------------------
-
-            // Only affect the object if it's moving:
-            if (!physObj.GetComponent<XRGrabInteractable>().isSelected && 
-                physObj.GetComponent<Rigidbody>().velocity.magnitude > velocityThreshold){
-                // Debug.Log("GAMEOBJECT: " + physObj.name + " is moving at " + physObj.GetComponent<Rigidbody>().velocity.magnitude.ToString("F5"));
-                // Get the rigidbody components of the physics objects:
-                // Get the rest values of the object from the ValuesAtRest script:
-                ValuesAtRest restVals = physObj.GetComponent<ValuesAtRest>();
-                if (!rb.IsSleeping()){
-                    // Set mass to relativistic mass:
-                    rb.mass = getRelativeMass(rb, restVals);
-                    // Set size to relativistic size:
-                    setScale(physObj, getRelativeSize(rb, restVals));
+                // Reset object if it has fallen past the minimum height:
+                if (physObj.transform.position.y < minimuimHeight){
+                    physObj.GetComponent<ValuesAtRest>().resetPosition();
                 }
 
-            // ------------------------  DOPPLER SHIFT  ------------------------
+                // ------------------------  GRAVITY  ------------------------
 
-                // Get bool for direction of movement in relation to player (true towards, false away):
-                bool direction = CheckDirection(physObj);
-                float vel = rb.velocity.magnitude;
+                // Get the rigidbody component of the physics objects:
+                Rigidbody rb = physObj.GetComponent<Rigidbody>();
+                // Set gravity to false so we can add our custom force of gravity:
+                rb.useGravity = false;
+                // Add custom gravity force:
+                rb.AddForce(new Vector3(0, -1.0f, 0) * rb.mass * gravity * gravityMultiplier);
 
-                // Scale the velocity to a hue value:
-                float hue = velocityToHue(direction, vel);
+                // ------------------------  SPEED OF LIGHT  ------------------------
 
-                // Add the hue to the materials:
-                try{
+                // Only affect the object if it's moving:
+                if (!physObj.GetComponent<XRGrabInteractable>().isSelected && 
+                    physObj.GetComponent<Rigidbody>().velocity.magnitude > velocityThreshold){
+                    // Debug.Log("GAMEOBJECT: " + physObj.name + " is moving at " + physObj.GetComponent<Rigidbody>().velocity.magnitude.ToString("F5"));
+                    // Get the rigidbody components of the physics objects:
+                    // Get the rest values of the object from the ValuesAtRest script:
+                    ValuesAtRest restVals = physObj.GetComponent<ValuesAtRest>();
+                    if (!rb.IsSleeping()){
+                        // Set mass to relativistic mass:
+                        rb.mass = getRelativeMass(rb, restVals);
+                        // Set size to relativistic size:
+                        setScale(physObj, getRelativeSize(rb, restVals));
+                    }
+
+                // ------------------------  DOPPLER SHIFT  ------------------------
+                    if (doppler > 0){
+                        // Get bool for direction of movement in relation to player (true towards, false away):
+                        bool direction = CheckDirection(physObj);
+                        float vel = rb.velocity.magnitude;
+
+                        // Scale the velocity to a hue value:
+                        float hue = velocityToHue(direction, vel);
+                        Debug.Log("Velocity of " + vel + ", Hue of " + hue);
+
+                        // Add the hue to the materials:
+                        try{
+                            ValuesAtRest valuesAtRest = physObj.GetComponent<ValuesAtRest>();
+                            valuesAtRest.setColour(Color.HSVToRGB(hue, 0.75f, 0.75f));
+                        } catch(NullReferenceException e){
+                            Debug.Log(e.Message + " - No component found when searching for <ValuesAtRest> in " + physObj.name);
+                        }
+                    }
+                } else {
+                    // Reset the object's colour:
                     ValuesAtRest valuesAtRest = physObj.GetComponent<ValuesAtRest>();
-                    valuesAtRest.setColour(Color.HSVToRGB(hue, 40f, 40f));
-                } catch(NullReferenceException e){
-                    Debug.Log(e.Message + " - No component found when searching for <ValuesAtRest> in " + physObj.name);
-                }
-            } else {
-                // Reset the object's colour:
-                ValuesAtRest valuesAtRest = physObj.GetComponent<ValuesAtRest>();
-                if (valuesAtRest.isColourChanged()){
-                    valuesAtRest.resetColours();
-                }
-            } if (physObj.GetComponent<XRGrabInteractable>().isSelected){
-                // If the object is selected...
-                ValuesAtRest valuesAtRest = physObj.GetComponent<ValuesAtRest>();
-                // Reset the scale:
-                Vector3 restLength = valuesAtRest.getRestLength();
-                if (Vector3.Distance(physObj.transform.lossyScale, restLength) > restLength.magnitude/4){
-                    setScale(physObj, restLength);
-                }
-                // Reset the colour:
-                if (valuesAtRest.isColourChanged()){
-                    valuesAtRest.resetColours();
-                }
-            } 
+                    if (valuesAtRest.isColourChanged()){
+                        valuesAtRest.resetColours();
+                    }
+                } if (physObj.GetComponent<XRGrabInteractable>().isSelected){
+                    // If the object is selected...
+                    ValuesAtRest valuesAtRest = physObj.GetComponent<ValuesAtRest>();
+                    // Reset the scale:
+                    Vector3 restLength = valuesAtRest.getRestLength();
+                    if (Vector3.Distance(physObj.transform.lossyScale, restLength) > restLength.magnitude/4){
+                        setScale(physObj, restLength);
+                    }
+                    // Reset the colour:
+                    if (valuesAtRest.isColourChanged()){
+                        valuesAtRest.resetColours();
+                    }
+                } 
+            }
         }
     }
 
     public float velocityToHue(bool direction, float vel){
-        vel = Mathf.Abs(vel * (doppler / 10));
+        vel = Mathf.Clamp(Mathf.Abs(vel * (doppler / 10)), 0, 60);
         // Hue values between red & blue are 240 - 360, with a midpoint of 300:
-        if (vel > 60){
-            vel = 60;
-        } if (direction){
+        if (direction){
             vel = -vel;
         }
         
-        // In Unity, Hue is measured between 0 - 1, so map the value to that scale:
-        return (300 + vel) / 360;
+        // In Unity.Color, Hue is measured between 0 - 1, so map the value to that scale:
+        return (300f + vel) / 360f;
     }
 
     // Return true if the object is travelling towards the player, false if away:
