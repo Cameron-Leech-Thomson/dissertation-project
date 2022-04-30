@@ -11,6 +11,9 @@ public class PhysicsController : MonoBehaviour
     [Tooltip("The parent object containing all dynamic physics objects.")]
     public GameObject physicsObjectsContainer;
 
+    [Tooltip("Prefab for the show mass UI")]
+    public GameObject showMassPrefab;
+
     [Tooltip("The player's XR Rig")]
     public GameObject playerRig;
 
@@ -38,20 +41,31 @@ public class PhysicsController : MonoBehaviour
     void Start()
     {
         foreach(Transform child in physicsObjectsContainer.transform){
-            physObjects.Add(child.gameObject);
-            child.gameObject.AddComponent<ValuesAtRest>();
+            if (child.gameObject.tag.Equals("PhysContainer")){
+                foreach(Transform subChild in child.transform){
+                    if (subChild.gameObject.GetComponent<XRBaseInteractable>() != null){
+                        physObjects.Add(subChild.gameObject);
+                        subChild.gameObject.AddComponent<ValuesAtRest>(); 
+                    
+                        GameObject massUI = Instantiate(showMassPrefab) as GameObject;
+                        massUI.transform.SetParent(subChild,false);
+                        massUI.GetComponent<ShowMass>().init(playerRig);
+                    }
+                }
+            }
         }
         isStarted = true;
     }
 
     void FixedUpdate() {
+        if (isStarted){
+
         gravity = physicsSliders.gravitySlider.value;
 
         speedOfLight = (int)physicsSliders.speedOfLightSlider.value;
 
         doppler = (int)physicsSliders.dopplerShiftSlider.value;
 
-        if (isStarted){
             foreach(GameObject physObj in physObjects){
 
                 // Reset object if it has fallen past the minimum height:
@@ -66,7 +80,7 @@ public class PhysicsController : MonoBehaviour
                 // Set gravity to false so we can add our custom force of gravity:
                 rb.useGravity = false;
                 // Add custom gravity force:
-                rb.AddForce(new Vector3(0, -1.0f, 0) * rb.mass * gravity * gravityMultiplier);
+                rb.AddForce(Vector3.down * rb.mass * gravity * gravityMultiplier);
 
                 // ------------------------  SPEED OF LIGHT  ------------------------
 
@@ -92,7 +106,7 @@ public class PhysicsController : MonoBehaviour
 
                         // Scale the velocity to a hue value:
                         float hue = velocityToHue(direction, vel);
-                        Debug.Log("Velocity of " + vel + ", Hue of " + hue);
+                        // Debug.Log("Velocity of " + vel + ", Hue of " + hue);
 
                         // Add the hue to the materials:
                         try{

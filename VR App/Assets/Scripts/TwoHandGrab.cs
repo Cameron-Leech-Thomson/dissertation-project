@@ -10,11 +10,11 @@ public class TwoHandGrab : MonoBehaviour
     *   Makes sure that both controllers can't be holding the same object at the same time.
     */
 
-    public void StopGripRoutine(XRDirectInteractor controller){
-        StartCoroutine(stopGrip(controller));
+    public void StopGrip(XRDirectInteractor controller){
+        StartCoroutine(stopGripRoutine(controller));
     }
 
-    private IEnumerator stopGrip(XRDirectInteractor controller){
+    private IEnumerator stopGripRoutine(XRDirectInteractor controller){
         controller.allowHover = false;
         controller.allowSelect = false;
         yield return new WaitForSeconds(0.25f);

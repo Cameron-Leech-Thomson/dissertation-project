@@ -55,4 +55,11 @@ public class RenderLaser : MonoBehaviour
         lineRenderer.SetPosition(lineRenderer.positionCount - 2, origin);
     }
 
+    Vector3 vectorAbs(Vector3 v){
+        v.x = Mathf.Abs(v.x);
+        v.y = Mathf.Abs(v.y);
+        v.z = Mathf.Abs(v.z);
+        return v;
+    }
+
 }

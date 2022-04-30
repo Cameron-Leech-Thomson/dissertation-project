@@ -9,7 +9,8 @@ public class ValuesAtRest : MonoBehaviour
     float restMass;
     Vector3 restLength;
 
-    Transform restPos;
+    Vector3 restPos;
+    Quaternion restRot;
 
     Renderer[] renderers;
     Color defaultSpecular = Color.HSVToRGB(0f, 0f, 0.2f);
@@ -25,7 +26,8 @@ public class ValuesAtRest : MonoBehaviour
     void Start() {
         materialPropertyBlock = new MaterialPropertyBlock();
         // Get starting position of object in case it needs to be reset:
-        restPos = gameObject.transform;
+        restPos = gameObject.transform.position;
+        restRot = gameObject.transform.rotation;
         // Get rigidbody component:
         Rigidbody rb = gameObject.GetComponent<Rigidbody>();
 
@@ -44,8 +46,8 @@ public class ValuesAtRest : MonoBehaviour
     }
 
     public void resetPosition(){
-        gameObject.transform.position = restPos.position;
-        gameObject.transform.rotation = restPos.rotation;
+        gameObject.transform.position = restPos;
+        gameObject.transform.rotation = restRot;
     }
 
     public bool isColourChanged(){

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.UI;
+using TMPro;
 
 public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
 {
@@ -22,6 +24,8 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
     [Tooltip("The game object(s) that will be activated once this button has been pressed")]
     public GameObject[] activates;
 
+    Canvas forceCanvas;
+
     MeshCollider buttonCollider;
 
     Vector3 buttonUp;
@@ -30,12 +34,18 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
     // Start is called before the first frame update
     void Start()
     {
+        forceCanvas = GetComponentInChildren<Canvas>();
+        forceCanvas.GetComponentInChildren<TextMeshProUGUI>().SetText("Force Required:\n" + forceRequired);
         buttonCollider = buttonSwitch.GetComponent<MeshCollider>();
         ColliderBridge cb = buttonCollider.gameObject.AddComponent<ColliderBridge>();
         cb.Initalize(this);
 
         buttonUp = buttonSwitch.transform.position;
         buttonDown = buttonUp - (new Vector3(0, 0.05f, 0) * transform.lossyScale.y);
+    }
+
+    void Update() {
+        forceCanvas.transform.LookAt(physics.playerRig.GetComponentInChildren<Camera>().transform);
     }
 
     public void OnCollisionEnter(Collision collisionInfo)
@@ -49,7 +59,7 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
                 Rigidbody rb = dynObject.GetComponent<Rigidbody>();
                 // Calculate the downward force it is exerting:
                 float gravity = physics.getValues()[0];
-                float downForce = rb.mass * gravity * physics.gravityMultiplier;
+                float downForce = rb.mass * gravity;
 
                 if (downForce > forceRequired){
 					activated = true;
