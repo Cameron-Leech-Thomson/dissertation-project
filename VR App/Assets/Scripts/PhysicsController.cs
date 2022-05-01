@@ -27,8 +27,6 @@ public class PhysicsController : MonoBehaviour
 
     [Tooltip("Minimum tolerance to consider an object to be moving or not:")]
     public float velocityThreshold = 0.1f;
-    [Tooltip("Multiplier to make the value of gravity feel more floaty")]
-    public float gravityMultiplier = 0.75f;
     float gravity = 9.81f;
     int speedOfLight = 300000000;
     int doppler = 0;
@@ -46,6 +44,7 @@ public class PhysicsController : MonoBehaviour
                     if (subChild.gameObject.GetComponent<XRBaseInteractable>() != null){
                         physObjects.Add(subChild.gameObject);
                         subChild.gameObject.AddComponent<ValuesAtRest>(); 
+                        subChild.gameObject.AddComponent<GetAcceleration>();
                     
                         GameObject massUI = Instantiate(showMassPrefab) as GameObject;
                         massUI.transform.SetParent(subChild,false);
@@ -80,13 +79,17 @@ public class PhysicsController : MonoBehaviour
                 // Set gravity to false so we can add our custom force of gravity:
                 rb.useGravity = false;
                 // Add custom gravity force:
-                rb.AddForce(Vector3.down * rb.mass * gravity * gravityMultiplier);
+                rb.AddForce(Vector3.down * rb.mass * gravity, ForceMode.Acceleration);
+                // if (Math.Abs(rb.velocity.y) > velocityThreshold){
+                //     Debug.Log("Downward Velocity of: " + rb.velocity.y);
+                // }
+                
 
                 // ------------------------  SPEED OF LIGHT  ------------------------
 
                 // Only affect the object if it's moving:
                 if (!physObj.GetComponent<XRGrabInteractable>().isSelected && 
-                    physObj.GetComponent<Rigidbody>().velocity.magnitude > velocityThreshold){
+                    Math.Abs(physObj.GetComponent<Rigidbody>().velocity.magnitude) > velocityThreshold){
                     // Debug.Log("GAMEOBJECT: " + physObj.name + " is moving at " + physObj.GetComponent<Rigidbody>().velocity.magnitude.ToString("F5"));
                     // Get the rigidbody components of the physics objects:
                     // Get the rest values of the object from the ValuesAtRest script:

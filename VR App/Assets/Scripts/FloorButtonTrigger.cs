@@ -58,8 +58,9 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
                 // Get the rigidbody belonging to the dynamic object:
                 Rigidbody rb = dynObject.GetComponent<Rigidbody>();
                 // Calculate the downward force it is exerting:
-                float gravity = physics.getValues()[0];
-                float downForce = rb.mass * gravity;
+                Vector3 acceleration = dynObject.GetComponent<GetAcceleration>().getAcceleration();
+                float downForce = rb.mass * Mathf.Abs(acceleration.y);
+                Debug.Log("Downforce = " + downForce);
 
                 if (downForce > forceRequired){
 					activated = true;
@@ -76,13 +77,17 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
 		/* TODO: Call the activate command of whatever it is connected to.
 			Need to check if it needs to be activated or deactivated.
 		*/
-		foreach (GameObject obj in activates){
-			// Get the activator component of the object:
-            Activatable activator = obj.GetComponent<Activatable>();
-			if (activator != null){
-				activator.activate();
-			}
-		}
+        if (activates != null){
+            foreach (GameObject obj in activates){
+                // Get the activator component of the object:
+                Activatable activator = obj.GetComponent<Activatable>();
+                if (activator != null){
+                    activator.activate();
+                }
+		    }
+        }
+		
+        forceCanvas.gameObject.SetActive(false);
     }
 
     public void OnCollisionExit(Collision collisionInfo)
