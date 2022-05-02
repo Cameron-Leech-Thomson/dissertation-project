@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using TMPro;
 
 public class WallButtonTrigger : MonoBehaviour, ButtonTrigger
 {
@@ -22,16 +23,22 @@ public class WallButtonTrigger : MonoBehaviour, ButtonTrigger
     [Tooltip("The game object(s) that will be activated once this button has been pressed")]
     public GameObject[] activates;
 
+    [Tooltip("Activates whenever something touches the button, regardless if it will successfuly activate or not")]
+    public GameObject[] alwaysActivate = null;
+
+    Canvas forceCanvas;
+
     MeshCollider buttonCollider;
 
     Vector3 buttonUp;
     Vector3 buttonDown;
 
-    GetVelocity getVel;
-
     // Start is called before the first frame update
     void Start()
     {
+        forceCanvas = GetComponentInChildren<Canvas>();
+        forceCanvas.GetComponentInChildren<TextMeshProUGUI>().SetText("Force Required:\n" + forceRequired);
+
         buttonCollider = buttonSwitch.GetComponent<MeshCollider>();
         ColliderBridge cb = buttonCollider.gameObject.AddComponent<ColliderBridge>();
         cb.Initalize(this);
@@ -41,8 +48,10 @@ public class WallButtonTrigger : MonoBehaviour, ButtonTrigger
         Transform buttonTransform = buttonSwitch.transform;
         buttonUp = buttonTransform.position;
         buttonDown = buttonUp - multiplyVectors(offsetVector, buttonSwitch.transform.up);
+    }
 
-        getVel = GetComponentInChildren<GetVelocity>();
+    void Update() {
+        forceCanvas.transform.LookAt(physics.playerRig.GetComponentInChildren<Camera>().transform);
     }
 
 	private Vector3 multiplyVectors(Vector3 v1, Vector3 v2){
@@ -58,32 +67,41 @@ public class WallButtonTrigger : MonoBehaviour, ButtonTrigger
         if (!activated){
             // Get object that is interacting with the button:
             GameObject dynObject = collisionInfo.gameObject;
-			Debug.Log("Collision with " + dynObject.name);
+
             // Check if the object colliding with the button is a valid interactable:
             if (dynObject.GetComponent<XRGrabInteractable>() != null){
                 // Get the rigidbody belonging to the dynamic object:
                 Rigidbody rb = dynObject.GetComponent<Rigidbody>();
 
-                Vector3 vel = getVel.getVelocity();
-				Debug.Log("Velocity: " + vel.ToString());
-                // Get where the button is facing to figure out which component of the velocity vector to check:
-                Vector3 facing = buttonSwitch.transform.up;
-                float velDir;
-                if (facing.x != 0.0f){
-                    velDir = Mathf.Abs(vel.x);
-                } else {
-                    velDir = Mathf.Abs(vel.z);
-                }
+                Vector3 acc = dynObject.GetComponent<GetAcceleration>().getAcceleration();
+                Vector3 vel = dynObject.GetComponent<GetAcceleration>().getLastVelocity();
+                
+                float force1 = Mathf.Abs(calculateForce(acc, rb.mass));
+                // Calculate force with velocity in case LaunchObject is used:
+                // Dampen it with a constant because it's a bit unfair if not.
+                float force2 = Mathf.Abs(calculateForce(vel, rb.mass)) * 0.5f;
 
-                // Calculate the force applied:
-                float force = rb.mass * velDir;
-				Debug.Log("Force Applied: " + force.ToString());
-                if (force > forceRequired){
-					activated = true;
+                if (force1 > forceRequired || force2 > forceRequired){
+                    activated = true;
                     activateButton();
-                }
+                }                
             }
         }
+    }
+
+    float calculateForce(Vector3 acc, float mass){
+        // Get where the button is facing to figure out which component of the velocity vector to check:
+        Vector3 facing = buttonSwitch.transform.up;
+
+        float acceleration;
+        if (facing.x != 0.0f){
+            acceleration = Mathf.Abs(acc.x);
+        } else {
+            acceleration = Mathf.Abs(acc.z);
+        }
+
+        // Calculate the force applied (includes relativistic mass from SoL calculations in PhysicsController):
+        return mass * acceleration;
     }
 
     public void activateButton(){
@@ -100,6 +118,8 @@ public class WallButtonTrigger : MonoBehaviour, ButtonTrigger
 				activator.activate();
 			}
 		}
+
+        forceCanvas.gameObject.SetActive(false);
     }
 
     public void OnCollisionExit(Collision collisionInfo) {

@@ -9,13 +9,15 @@ public class ValuesAtRest : MonoBehaviour
     float restMass;
     Vector3 restLength;
 
-    Vector3 restPos;
-    Quaternion restRot;
+    internal Vector3 restPos;
+    Vector3 restRot;
 
     Renderer[] renderers;
     Color defaultSpecular = Color.HSVToRGB(0f, 0f, 0.2f);
 
     MaterialPropertyBlock materialPropertyBlock;
+
+    Rigidbody rb;
 
     bool colourChanged = false;
 
@@ -27,9 +29,9 @@ public class ValuesAtRest : MonoBehaviour
         materialPropertyBlock = new MaterialPropertyBlock();
         // Get starting position of object in case it needs to be reset:
         restPos = gameObject.transform.position;
-        restRot = gameObject.transform.rotation;
+        restRot = gameObject.transform.eulerAngles;
         // Get rigidbody component:
-        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb = gameObject.GetComponent<Rigidbody>();
 
         // Get rest mass from Rigidbody vals:
         restMass = rb.mass;
@@ -46,8 +48,11 @@ public class ValuesAtRest : MonoBehaviour
     }
 
     public void resetPosition(){
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
         gameObject.transform.position = restPos;
-        gameObject.transform.rotation = restRot;
+        gameObject.transform.eulerAngles = restRot;
     }
 
     public bool isColourChanged(){

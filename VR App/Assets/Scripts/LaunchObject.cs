@@ -8,7 +8,10 @@ public class LaunchObject : MonoBehaviour
 {
     
     XRDirectInteractor interactor;
+
     public XRInteractionManager interactionManager;
+
+    public PhysicsController physics;
 
     public Slider powerBar;
 
@@ -53,6 +56,7 @@ public class LaunchObject : MonoBehaviour
             powerBar.gameObject.SetActive(false);
             // Get the interactable that is currently selected:
             XRBaseInteractable heldItem = interactor.selectTarget;
+            Rigidbody rb = heldItem.gameObject.GetComponent<Rigidbody>();
             interactor.allowSelect = false;
             // Deselect the interactable before launching:
             try{
@@ -64,15 +68,16 @@ public class LaunchObject : MonoBehaviour
                 StartCoroutine(resetSelect());
                 return;
             }
-            
-            Rigidbody rb = heldItem.gameObject.GetComponent<Rigidbody>();
 
             float offset = Mathf.Abs(Mathf.Log(rb.mass));
             if (offset == 0){
                 offset = 1.5f;
             }
 
+
             Vector3 fwdVector = gameObject.transform.forward;
+
+            // Launch the object:
             rb.AddForce(fwdVector * (currentPower / offset), ForceMode.VelocityChange);
 
             StartCoroutine(resetSelect());
@@ -84,10 +89,9 @@ public class LaunchObject : MonoBehaviour
             holdingToFire(false);
         }
     }
-
     private IEnumerator resetSelect()
     {
-        yield return new WaitForSeconds(1.1f);
+        yield return new WaitForSeconds(1f);
         
         interactor.allowSelect = true;
     }

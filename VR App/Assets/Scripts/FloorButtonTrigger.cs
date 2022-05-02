@@ -22,7 +22,10 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
     bool activated = false;
 
     [Tooltip("The game object(s) that will be activated once this button has been pressed")]
-    public GameObject[] activates;
+    public GameObject[] activates = null;
+
+    [Tooltip("Activates whenever something touches the button, regardless if it will successfuly activate or not")]
+    public GameObject[] alwaysActivate = null;
 
     Canvas forceCanvas;
 
@@ -36,6 +39,7 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
     {
         forceCanvas = GetComponentInChildren<Canvas>();
         forceCanvas.GetComponentInChildren<TextMeshProUGUI>().SetText("Force Required:\n" + forceRequired);
+        
         buttonCollider = buttonSwitch.GetComponent<MeshCollider>();
         ColliderBridge cb = buttonCollider.gameObject.AddComponent<ColliderBridge>();
         cb.Initalize(this);
@@ -67,6 +71,15 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
                     activateButton();
                 }
             }
+        }
+        if (alwaysActivate != null){
+           foreach(GameObject obj in alwaysActivate){
+                // Get the activator component of the object:
+                Activatable activator = obj.GetComponent<Activatable>();
+                if (activator != null){
+                    activator.activate();
+                }
+            } 
         }
     }
 

@@ -20,8 +20,8 @@ public class ChangeAccuracy : MonoBehaviour
     public void buttonSelected(){
         isSelected = !isSelected;
         if (isSelected){
-            slider.maxValue = 100;
-            slider.value = 100;
+            slider.maxValue = 50;
+            slider.value = 50;
         } else{
             slider.maxValue = 300000000;
             slider.value = 300000000;

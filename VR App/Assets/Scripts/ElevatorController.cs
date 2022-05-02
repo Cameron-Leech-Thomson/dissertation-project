@@ -80,7 +80,7 @@ public class ElevatorController : MonoBehaviour
 
     void setMovement(bool b){
         foreach(XRRayInteractor interactor in rayInteractors){
-                interactor.enabled = b;
+                interactor.gameObject.SetActive(b);
             }
     }
 }

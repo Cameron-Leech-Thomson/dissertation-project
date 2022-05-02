@@ -2,50 +2,56 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeactivePreviousObjects : MonoBehaviour
+public class DissolveOnActivate : MonoBehaviour, Activatable
 {
-
-    public LayerMask playerLayer;
-    
-    public GameObject[] objectsToRemove;
 
     public Shader dissolveShader;
 
     bool shouldRemove = false;
     bool complete = false;
+
+    bool active;
     
     List<float> times = new List<float>();
     List<Renderer> rends = new List<Renderer>();
 
     private string baseMap = "Texture2D_3c2299dec1d947c39196be3fe9e08d37";
+    private string otherMap = "_MainTex";
     private string dissolveProgress = "_DissolveProgress";
 
     void Start() {
-        foreach(GameObject obj in objectsToRemove){
-            Renderer[] rend = obj.GetComponents<Renderer>();
-            foreach(Renderer r in rend){
-                rends.Add(r);
-                times.Add(0f);
-            }
+        Renderer[] rend = gameObject.GetComponents<Renderer>();
+        foreach(Renderer r in rend){
+            rends.Add(r);
+            times.Add(0f);
         }
     }
 
-    void OnTriggerEnter(Collider collisionInfo)
+    public void activate()
     {
-        GameObject collision = collisionInfo.gameObject;
-        if(LayerMask.GetMask(LayerMask.LayerToName(collision.layer)) == playerLayer){
-            foreach (Renderer rend in rends){
-                if (rend.enabled){
-                    MaterialPropertyBlock mpb = new MaterialPropertyBlock();
-                    Texture tex = rend.material.GetTexture(baseMap);
-                    rend.material.shader = dissolveShader;
+        foreach (Renderer rend in rends){
+            if (rend.enabled){
+                MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+                Texture tex = rend.material.mainTexture;     
+                Color col = rend.material.color;               
+                
+                rend.material.shader = dissolveShader;
+                if (tex == null){
+                    rend.material.color = col;
+                } else{
                     mpb.SetTexture("_Texture", tex);
                     rend.SetPropertyBlock(mpb);
-                    shouldRemove = true;
                 }
                 
-            }
+                shouldRemove = true;
+            }   
         }
+    }
+
+    public void deactivate(){}
+
+    public bool isActive(){
+        return active;
     }
 
     void Update() {
@@ -58,17 +64,11 @@ public class DeactivePreviousObjects : MonoBehaviour
                 times[i] += Time.deltaTime;
             }
             if (Mathf.Lerp(0f, 1f, times[times.Count - 1]) == 1f){
-                foreach(GameObject obj in objectsToRemove){
-                    obj.SetActive(false);
-                }
                 complete = true;
             }            
         }
         if (shouldRemove && complete){
-            foreach(GameObject obj in objectsToRemove){
-                obj.SetActive(false);
-            }
+            gameObject.SetActive(false);
         }
     }
-
 }
