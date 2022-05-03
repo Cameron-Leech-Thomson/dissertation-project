@@ -13,6 +13,7 @@ public class RenderLaser : MonoBehaviour
 
     internal RaycastHit raycastHit;
     internal Vector3 expectedFinish;
+    internal Vector3 startPos;
 
     // Start is called before the first frame update
     void Start()
@@ -20,7 +21,9 @@ public class RenderLaser : MonoBehaviour
         lineRenderer = GetComponent<LineRenderer>();
         wireframe = GetComponent<RenderWireframe>();
 
-        expectedFinish = transform.position + (transform.up * laserMaxLength);
+        startPos = transform.position;
+
+        expectedFinish = startPos + (transform.up * laserMaxLength);
 
         StartCoroutine(waitForStart());
     }
@@ -31,14 +34,14 @@ public class RenderLaser : MonoBehaviour
             yield return null;
         }
         lineRenderer.positionCount += 2;
-        lineRenderer.SetPosition(lineRenderer.positionCount - 1, transform.position);
-        lineRenderer.SetPosition(lineRenderer.positionCount - 2, transform.position);
+        lineRenderer.SetPosition(lineRenderer.positionCount - 1, startPos);
+        lineRenderer.SetPosition(lineRenderer.positionCount - 2, startPos);
         readyToFire = true;
     }
 
     void FixedUpdate() {
         if (lineRenderer.enabled && readyToFire){
-            fireLaserForward(transform.position);
+            fireLaserForward(startPos);
         }
     }
 

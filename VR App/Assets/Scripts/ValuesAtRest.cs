@@ -65,7 +65,9 @@ public class ValuesAtRest : MonoBehaviour
     }
 
     public void setColour(Color col){
-        materialPropertyBlock.Clear();
+        if (materialPropertyBlock == null){
+            materialPropertyBlock = new MaterialPropertyBlock();
+        }
         // Set the colour to the MPB:
         materialPropertyBlock.SetFloat(specularHighlights, 1f); 
         materialPropertyBlock.SetColor(specularID, col);
@@ -81,7 +83,9 @@ public class ValuesAtRest : MonoBehaviour
     }
 
     public void resetColours(){
-        materialPropertyBlock.Clear();
+        if (materialPropertyBlock == null){
+            materialPropertyBlock = new MaterialPropertyBlock();
+        }
         // Set the colour to the MPB:
         materialPropertyBlock.SetFloat(specularHighlights, 1f); 
         materialPropertyBlock.SetColor(specularID, defaultSpecular);

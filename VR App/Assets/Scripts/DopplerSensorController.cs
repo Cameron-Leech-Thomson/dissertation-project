@@ -16,7 +16,7 @@ public class DopplerSensorController : MonoBehaviour
         
     LineRenderer lineRenderer;
     RenderLaser laser;
-    CapsuleCollider collider;
+    CapsuleCollider rayCollider;
     RaycastHit raycastHit;
 
     bool activated = false;
@@ -30,15 +30,15 @@ public class DopplerSensorController : MonoBehaviour
     {
         lineRenderer = GetComponent<LineRenderer>();
         laser = GetComponent<RenderLaser>();
-        collider = GetComponent<CapsuleCollider>();
+        rayCollider = GetComponent<CapsuleCollider>();
         baseColour = lineRenderer.material.GetColor(lineColour);
         activatedColour = lineRenderer.material.GetColor(actColour);
         setupCollider(laser.laserMaxLength, laser.expectedFinish);
     }
 
     void setupCollider(float length, Vector3 endpoint){
-        collider.height = length;
-        collider.center = midpoint(transform.InverseTransformPoint(transform.position), transform.InverseTransformPoint(endpoint));
+        rayCollider.height = length;
+        rayCollider.center = Vector3.up * (length / 2f);
     }
 
     Vector3 midpoint(Vector3 v1, Vector3 v2){
@@ -69,9 +69,16 @@ public class DopplerSensorController : MonoBehaviour
                     rends[i].GetPropertyBlock(mpb);
                     // Get the specular map from the material:
                     colours[i] = mpb.GetColor(specularID);
+                    Debug.Log("Colour " + colours[i].ToString("F3"));
 
                     float h, s, v = 0;
                     Color.RGBToHSV(colours[i], out h, out s, out v);
+
+                    Debug.Log("HUE " + h);
+
+                    if (colours[i].r > 0.5f && h == 0){
+                        h = 1f;
+                    }
 
                     // If the hue is tending to red:
                     if (h > (float)300f / 360f && redShift)
@@ -97,7 +104,8 @@ public class DopplerSensorController : MonoBehaviour
         if (Vector3.Distance(point,laser.expectedFinish) > 0.05f && hit.point != Vector3.zero){
             // Move the collider to fit that:
             setupCollider(Vector3.Distance(transform.position, point), point);
-        } if ((Vector3.Distance(point,laser.expectedFinish) < 0.05f || hit.point == Vector3.zero) && collider.height < laser.laserMaxLength){
+        } if ((Vector3.Distance(point, laser.expectedFinish) < 0.05f || hit.point == Vector3.zero) && 
+        (GetComponent<Collider>() as CapsuleCollider).height < laser.laserMaxLength){
             setupCollider(laser.laserMaxLength, laser.expectedFinish);
         }
     }
@@ -107,11 +115,14 @@ public class DopplerSensorController : MonoBehaviour
         // Activate the attached components:
         foreach (GameObject obj in activates){
 			// Get the activator component of the object:
-            Activatable activator = obj.GetComponent<Activatable>();
-			if (activator != null){
-				activator.activate();
-			}
+            Activatable[] activators = obj.GetComponents<Activatable>();
+            foreach (Activatable activator in activators){
+                if (activator != null){
+				    activator.activate();
+			    }
+            }			
 		}
+        activated = true;
     }
 
     private IEnumerator flashColour(){

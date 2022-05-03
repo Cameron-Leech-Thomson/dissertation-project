@@ -69,16 +69,8 @@ public class LaunchObject : MonoBehaviour
                 return;
             }
 
-            float offset = Mathf.Abs(Mathf.Log(rb.mass));
-            if (offset == 0){
-                offset = 1.5f;
-            }
-
-
-            Vector3 fwdVector = gameObject.transform.forward;
-
             // Launch the object:
-            rb.AddForce(fwdVector * (currentPower / offset), ForceMode.VelocityChange);
+            rb.AddForce(transform.forward * currentPower, ForceMode.VelocityChange);
 
             StartCoroutine(resetSelect());
 

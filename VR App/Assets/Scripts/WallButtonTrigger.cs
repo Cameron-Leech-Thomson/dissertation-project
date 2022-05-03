@@ -113,10 +113,12 @@ public class WallButtonTrigger : MonoBehaviour, ButtonTrigger
         */
         foreach (GameObject obj in activates){
 			// Get the activator component of the object:
-            Activatable activator = obj.GetComponent<Activatable>();
-			if (activator != null){
-				activator.activate();
-			}
+            Activatable[] activators = obj.GetComponents<Activatable>();
+            foreach (Activatable activator in activators){
+                if (activator != null){
+				    activator.activate();
+			    }
+            }
 		}
 
         forceCanvas.gameObject.SetActive(false);

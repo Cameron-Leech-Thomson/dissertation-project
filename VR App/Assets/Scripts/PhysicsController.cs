@@ -82,92 +82,92 @@ public class PhysicsController : MonoBehaviour
             doppler = (int)physicsSliders.dopplerShiftSlider.value;
 
             foreach (GameObject physObj in physObjects){
-                ValuesAtRest restVals = physObj.GetComponent<ValuesAtRest>();
-                // Reset object if it has fallen past the minimum height:
-                if (physObj.transform.position.y < minimuimHeight || Vector3.Distance(physObj.transform.position, restVals.restPos) > 50f){
-                    physObj.GetComponent<ResetPositionActivatable>().activate();
-                }
+                if (physObj.activeSelf){
+                    ValuesAtRest restVals = physObj.GetComponent<ValuesAtRest>();
+                    // Reset object if it has fallen past the minimum height:
+                    if (physObj.transform.position.y < minimuimHeight || Vector3.Distance(physObj.transform.position, restVals.restPos) > 50f){
+                        physObj.GetComponent<ResetPositionActivatable>().activate();
+                    }
 
-                // Get the rigidbody component of the physics objects:
-                Rigidbody rb = physObj.GetComponent<Rigidbody>();
+                    // Get the rigidbody component of the physics objects:
+                    Rigidbody rb = physObj.GetComponent<Rigidbody>();
 
-                if (!physObj.GetComponent<XRGrabInteractable>().isSelected){
+                    if (!physObj.GetComponent<XRGrabInteractable>().isSelected){
 
-                    // ------------------------  GRAVITY  ------------------------
+                        // ------------------------  GRAVITY  ------------------------
 
-                    // Add custom gravity force...
-                    // Add gravity, gravity changes relatively, so it would always appear to change the object at the same rate,
-                    // Hence the rest mass being used rather than the relative mass:
-                    rb.AddForce(Vector3.down * restVals.getRestMass() * gravity, ForceMode.Acceleration);
+                        // Add custom gravity force...
+                        // Add gravity, gravity changes relatively, so it would always appear to change the object at the same rate,
+                        // Hence the rest mass being used rather than the relative mass:
+                        rb.AddForce(Vector3.down * restVals.getRestMass() * gravity, ForceMode.Acceleration);
 
-                    // if (Math.Abs(rb.velocity.y) > velocityThreshold && rb.velocity.y < 0){
-                    //     Debug.Log("Downward Velocity of: " + rb.velocity.y);
-                    // }
+                        // if (Math.Abs(rb.velocity.y) > velocityThreshold && rb.velocity.y < 0){
+                        //     Debug.Log("Downward Velocity of: " + rb.velocity.y);
+                        // }
 
-                    // ------------------------  SPEED OF LIGHT  ------------------------
+                        // ------------------------  SPEED OF LIGHT  ------------------------
 
-                    // Only affect the object if it's moving:
-                    if (Math.Abs(physObj.GetComponent<Rigidbody>().velocity.magnitude) > minVelocity.magnitude){
-                        // Debug.Log("GAMEOBJECT: " + physObj.name + " is moving at " + physObj.GetComponent<Rigidbody>().velocity.magnitude.ToString("F5"));
-                        // Get the rigidbody components of the physics objects:
-                        // Get the rest values of the object from the ValuesAtRest script:
-                        if (!rb.IsSleeping()){
-                            // Set mass to relativistic mass:
-                            Vector3 vel = rb.velocity;
-                            rb.mass = getRelativeMass(rb, restVals);
-                            rb.velocity = vel;
-                            // Set size to relativistic size:
-                            setScale(physObj, getRelativeSize(rb, restVals), restVals.getRestLength());
-                        }
+                        // Only affect the object if it's moving:
+                        if (Math.Abs(physObj.GetComponent<Rigidbody>().velocity.magnitude) > minVelocity.magnitude){
+                            // Debug.Log("GAMEOBJECT: " + physObj.name + " is moving at " + physObj.GetComponent<Rigidbody>().velocity.magnitude.ToString("F5"));
+                            // Get the rigidbody components of the physics objects:
+                            // Get the rest values of the object from the ValuesAtRest script:
+                            if (!rb.IsSleeping()){
+                                // Set mass to relativistic mass:
+                                Vector3 vel = rb.velocity;
+                                rb.mass = getRelativeMass(rb, restVals);
+                                rb.velocity = vel;
+                                // Set size to relativistic size:
+                                setScale(physObj, getRelativeSize(rb, restVals), restVals.getRestLength());
+                            }
 
-                        // ------------------------  DOPPLER SHIFT  ------------------------
+                            // ------------------------  DOPPLER SHIFT  ------------------------
 
-                        if (doppler > 0){
-                            // Get bool for direction of movement in relation to player (true towards, false away):
-                            bool direction = CheckDirection(physObj);
-                            float vel = rb.velocity.magnitude;
+                            if (doppler > 0){
+                                // Get bool for direction of movement in relation to player (true towards, false away):
+                                bool direction = CheckDirection(physObj);
+                                float vel = rb.velocity.magnitude;
 
-                            // Scale the velocity to a hue value:
-                            float hue = velocityToHue(direction, vel);
-                            // Debug.Log("Velocity of " + vel + ", Hue of " + hue);
+                                // Scale the velocity to a hue value:
+                                float hue = velocityToHue(direction, vel);
+                                // Debug.Log("Velocity of " + vel + ", Hue of " + hue);
 
-                            // Add the hue to the materials:
-                            try{
-                                ValuesAtRest valuesAtRest = physObj.GetComponent<ValuesAtRest>();
-                                valuesAtRest.setColour(Color.HSVToRGB(hue, 0.75f, 0.75f));
-                            }catch (NullReferenceException e)
+                                // Add the hue to the materials:
+                                try{
+                                    restVals.setColour(Color.HSVToRGB(hue, 0.75f, 0.75f));
+                                } catch(NullReferenceException e){
+                                    Debug.Log(e.Message + " | Error in ValuesAtRest - Likely Source: MaterialPropertyBlock.\n" + e.StackTrace);
+                                }                            
+                            }
+                        }else{
+                            // Reset the object's colour:
+                            Vector3 restLength = restVals.getRestLength();
+                            if (restLength != Vector3.zero){
+                                // If the current scale isn't within 0.1 of the original:
+                                if (Vector3.Distance(physObj.transform.lossyScale, restLength) > 0.1f){
+                                    // Reset:
+                                    setScale(physObj, restLength, restLength);
+                                }
+                            }if (restVals.isColourChanged())
                             {
-                                Debug.Log(e.Message + " - No component found when searching for <ValuesAtRest> in " + physObj.name);
+                                restVals.resetColours();
                             }
                         }
-                    }else{
-                        // Reset the object's colour:
-                        Vector3 restLength = restVals.getRestLength();
-                        if (restLength != Vector3.zero){
-                            // If the current scale isn't within 0.1 of the original:
-                            if (Vector3.Distance(physObj.transform.lossyScale, restLength) > 0.1f){
-                                // Reset:
-                                setScale(physObj, restLength, restLength);
-                            }
-                        }if (restVals.isColourChanged())
+                    } else{
+                        // If the object is selected...
+                        ValuesAtRest valuesAtRest = physObj.GetComponent<ValuesAtRest>();
+                        // Reset the scale:
+                        Vector3 restLength = valuesAtRest.getRestLength();
+                        setScale(physObj, restLength, valuesAtRest.getRestLength());
+                        // Reset the colour:
+                        if (valuesAtRest.isColourChanged())
                         {
-                            restVals.resetColours();
+                            valuesAtRest.resetColours();
                         }
+                        // Reset velocity:
+                        rb.velocity = Vector3.zero;
+                        rb.angularVelocity = Vector3.zero;
                     }
-                } else{
-                    // If the object is selected...
-                    ValuesAtRest valuesAtRest = physObj.GetComponent<ValuesAtRest>();
-                    // Reset the scale:
-                    Vector3 restLength = valuesAtRest.getRestLength();
-                    setScale(physObj, restLength, valuesAtRest.getRestLength());
-                    // Reset the colour:
-                    if (valuesAtRest.isColourChanged())
-                    {
-                        valuesAtRest.resetColours();
-                    }
-                    // Reset velocity:
-                    rb.velocity = Vector3.zero;
-                    rb.angularVelocity = Vector3.zero;
                 }
             }
         }
@@ -194,6 +194,8 @@ public class PhysicsController : MonoBehaviour
             dist = distTemp;
             return false;
         }
+        Debug.Log("Error in PhysicsController.CheckDirection - " + obj.name + " not moving towards nor away from the user.\nCurrent Dist: " + dist);
+        dist = 0;
         return false;
     }
 
@@ -228,13 +230,13 @@ public class PhysicsController : MonoBehaviour
 
     private Vector3 getRelativeSize(Rigidbody rb, ValuesAtRest restVals){
         // Get velocity:
-        Vector3 velocity = rb.velocity;
+        float velocity = rb.velocity.magnitude;
         // Get the rest length:
         Vector3 restLength = restVals.getRestLength();
 
-        Vector3 relativeSize = new Vector3(lorentzCalculation(Math.Abs(velocity.x), restLength.x),
-                                           lorentzCalculation(Math.Abs(velocity.y), restLength.y),
-                                           lorentzCalculation(Math.Abs(velocity.z), restLength.z));
+        Vector3 relativeSize = new Vector3(lorentzCalculation(Math.Abs(velocity), restLength.x),
+                                           lorentzCalculation(Math.Abs(velocity), restLength.y),
+                                           lorentzCalculation(Math.Abs(velocity), restLength.z));
         
         return relativeSize;
     }

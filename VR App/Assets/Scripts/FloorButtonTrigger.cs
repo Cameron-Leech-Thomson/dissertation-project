@@ -39,7 +39,7 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
     {
         forceCanvas = GetComponentInChildren<Canvas>();
         forceCanvas.GetComponentInChildren<TextMeshProUGUI>().SetText("Force Required:\n" + forceRequired);
-        
+
         buttonCollider = buttonSwitch.GetComponent<MeshCollider>();
         ColliderBridge cb = buttonCollider.gameObject.AddComponent<ColliderBridge>();
         cb.Initalize(this);
@@ -75,9 +75,11 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
         if (alwaysActivate != null){
            foreach(GameObject obj in alwaysActivate){
                 // Get the activator component of the object:
-                Activatable activator = obj.GetComponent<Activatable>();
-                if (activator != null){
-                    activator.activate();
+                Activatable[] activators = obj.GetComponents<Activatable>();
+                foreach (Activatable activator in activators){
+                    if (activator != null){
+                        activator.activate();
+                    }
                 }
             } 
         }
@@ -93,9 +95,11 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
         if (activates != null){
             foreach (GameObject obj in activates){
                 // Get the activator component of the object:
-                Activatable activator = obj.GetComponent<Activatable>();
-                if (activator != null){
-                    activator.activate();
+                Activatable[] activators = obj.GetComponents<Activatable>();
+                foreach (Activatable activator in activators){
+                    if (activator != null){
+                        activator.activate();
+                    }
                 }
 		    }
         }

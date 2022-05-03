@@ -32,9 +32,18 @@ public class DissolveOnActivate : MonoBehaviour, Activatable
         foreach (Renderer rend in rends){
             if (rend.enabled){
                 MaterialPropertyBlock mpb = new MaterialPropertyBlock();
-                Texture tex = rend.material.mainTexture;     
-                Color col = rend.material.color;               
-                
+                Texture tex = null;
+                Color col = Color.black;
+                try{
+                    tex = rend.material.mainTexture;
+                } catch{
+                    try{
+                        col = rend.material.color;
+                    } catch{
+                        col = Color.black;
+                    }
+                }                
+
                 rend.material.shader = dissolveShader;
                 if (tex == null){
                     rend.material.color = col;
@@ -46,6 +55,7 @@ public class DissolveOnActivate : MonoBehaviour, Activatable
                 shouldRemove = true;
             }   
         }
+        active = true;
     }
 
     public void deactivate(){}
@@ -59,13 +69,14 @@ public class DissolveOnActivate : MonoBehaviour, Activatable
             for(int i = 0; i < rends.Count; i++){
                 float x = Mathf.Lerp(0f, 1f, times[i]);
                 MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+
                 mpb.SetFloat(dissolveProgress, x);
                 rends[i].SetPropertyBlock(mpb);
                 times[i] += Time.deltaTime;
             }
             if (Mathf.Lerp(0f, 1f, times[times.Count - 1]) == 1f){
                 complete = true;
-            }            
+            }
         }
         if (shouldRemove && complete){
             gameObject.SetActive(false);
