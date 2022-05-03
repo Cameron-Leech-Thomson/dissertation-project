@@ -15,6 +15,9 @@ public class ActivateInTrigger : MonoBehaviour
                     return;
                 } 
             }
+            if (activatable is LerpActivatable){
+                return;
+            }
             activatable.activate();
         }
     }
