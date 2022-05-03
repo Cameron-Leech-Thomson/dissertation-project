@@ -105,7 +105,7 @@ public class DopplerSensorController : MonoBehaviour
             // Move the collider to fit that:
             setupCollider(Vector3.Distance(transform.position, point), point);
         } if ((Vector3.Distance(point, laser.expectedFinish) < 0.05f || hit.point == Vector3.zero) && 
-        (GetComponent<Collider>() as CapsuleCollider).height < laser.laserMaxLength){
+        (GetComponent<CapsuleCollider>()).height < laser.laserMaxLength){
             setupCollider(laser.laserMaxLength, laser.expectedFinish);
         }
     }

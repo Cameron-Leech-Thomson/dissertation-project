@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.ProBuilder;
+using TMPro;
 
 public class RenderWireframe : MonoBehaviour
 {
 
+    public bool redShift = true;
     ProBuilderMesh mesh;
     LineRenderer frameRenderer;
 
@@ -16,13 +18,21 @@ public class RenderWireframe : MonoBehaviour
     {
         mesh = GetComponent<ProBuilderMesh>();
         frameRenderer = GetComponent<LineRenderer>();
-        Vertex[] vertices = mesh.GetVertices();
-        Vector3[] positions = new Vector3[vertices.Length];
-        for(int i = 0; i < vertices.Length; i++){
-            positions[i] = transform.TransformPoint(vertices[i].position);
+        if (redShift){
+            frameRenderer.material = Resources.Load("WireframeMat") as Material;
+        } else{
+            frameRenderer.material = Resources.Load("BlueWireframeMat") as Material;
         }
+
+        IList<Vector3> vertices = mesh.positions;
+        Vector3[] positions = new Vector3[vertices.Count];
+        for(int i = 0; i < vertices.Count; i++){
+            positions[i] = transform.TransformPoint(vertices[i]);
+        }
+
         frameRenderer.positionCount = positions.Length;
         frameRenderer.SetPositions(positions);
+
         isStarted = true;
     }
 }

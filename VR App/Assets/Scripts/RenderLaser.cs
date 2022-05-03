@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class RenderLaser : MonoBehaviour
 {
@@ -36,6 +37,7 @@ public class RenderLaser : MonoBehaviour
         lineRenderer.positionCount += 2;
         lineRenderer.SetPosition(lineRenderer.positionCount - 1, startPos);
         lineRenderer.SetPosition(lineRenderer.positionCount - 2, startPos);
+
         readyToFire = true;
     }
 

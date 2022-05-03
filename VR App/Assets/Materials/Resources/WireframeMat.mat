@@ -105,7 +105,9 @@ Material:
     m_Colors:
     - Color_35787cda07234d8990e46e2adbc4c628: {r: 0.1996537, g: 2.118547, b: 0, a: 0}
     - Color_960740488b1a4bd6a11cbd28285a808d: {r: 16, g: 0, b: 0, a: 1}
+    - _ActivateColour: {r: 0.03137255, g: 5.992157, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColour: {r: 5.992157, g: 0, b: 0, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
