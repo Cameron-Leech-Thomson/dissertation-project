@@ -64,7 +64,6 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
                 // Calculate the downward force it is exerting:
                 Vector3 acceleration = dynObject.GetComponent<GetAcceleration>().getAcceleration();
                 float downForce = rb.mass * Mathf.Abs(acceleration.y);
-                Debug.Log("Downforce = " + downForce);
 
                 if (downForce > forceRequired){
 					activated = true;
@@ -89,9 +88,7 @@ public class FloorButtonTrigger : MonoBehaviour, ButtonTrigger
         // Move the button down:
         StartCoroutine(LerpPosition.LerpPos(buttonSwitch.transform, buttonDown, 3));
 
-		/* TODO: Call the activate command of whatever it is connected to.
-			Need to check if it needs to be activated or deactivated.
-		*/
+		// Call the activate command of whatever it is connected to:
         if (activates != null){
             foreach (GameObject obj in activates){
                 // Get the activator component of the object:

@@ -73,10 +73,8 @@ public class ValuesAtRest : MonoBehaviour
         materialPropertyBlock.SetColor(specularID, col);
         float h, s, v = 0;
         Color.RGBToHSV(materialPropertyBlock.GetColor(specularID), out h, out s, out v);
-        // string colVal = "(" + h + ", " + s + ", + " + v +")";
         // Apply the propertyBlock to the renderers:
         foreach(Renderer rend in renderers){
-            // Debug.Log("Setting " + rend.gameObject.name + " - " + specularID + " - to HSV: " + colVal);
             rend.SetPropertyBlock(materialPropertyBlock);
         }
         colourChanged = true;
@@ -91,10 +89,8 @@ public class ValuesAtRest : MonoBehaviour
         materialPropertyBlock.SetColor(specularID, defaultSpecular);
         float h, s, v = 0;
         Color.RGBToHSV(materialPropertyBlock.GetColor(specularID), out h, out s, out v);
-        // string colVal = "(" + h + ", " + s + ", + " + v +")";
         foreach(Renderer rend in renderers){
             // Apply the property to the renderer:
-            // Debug.Log("Re-Setting " + rend.gameObject.name + " - " + specularID + " - to HSV: " + colVal);
             rend.SetPropertyBlock(materialPropertyBlock);
         }
         colourChanged = false;

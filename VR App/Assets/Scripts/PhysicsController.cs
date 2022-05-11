@@ -35,7 +35,7 @@ public class PhysicsController : MonoBehaviour
     int speedOfLight = PhysicsMenu.SpeedOfLight;
     int doppler = PhysicsMenu.Doppler;
 
-    float dist;
+    float[] dists;
 
     private bool isStarted = false;
 
@@ -53,7 +53,7 @@ public class PhysicsController : MonoBehaviour
                         childObj.AddComponent<GetAcceleration>();
                     
                         GameObject massUI = Instantiate(showMassPrefab) as GameObject;
-                        massUI.transform.SetParent(childObj.transform,false);
+                        massUI.transform.SetParent(childObj.transform, false);
                         massUI.GetComponent<ShowMass>().init(playerRig);
 
                         // Set gravity to false so we can add our custom force of gravity:
@@ -67,6 +67,12 @@ public class PhysicsController : MonoBehaviour
                 }
             }
         }
+
+        dists = new float[physObjects.Count];
+        for (int i = 0; i < dists.Length; i++){
+            dists[i] = 0;
+        }
+
         minVelocity = new Vector3(velocityThreshold, velocityThreshold, velocityThreshold);
         isStarted = true;
     }
@@ -96,21 +102,15 @@ public class PhysicsController : MonoBehaviour
 
                         // ------------------------  GRAVITY  ------------------------
 
-                        // Add custom gravity force...
-                        // Add gravity, gravity changes relatively, so it would always appear to change the object at the same rate,
+                        // Add custom gravity force. Gravity changes relatively, 
+                        // so it would always appear to change the object at the same rate,
                         // Hence the rest mass being used rather than the relative mass:
                         rb.AddForce(Vector3.down * restVals.getRestMass() * gravity, ForceMode.Acceleration);
-
-                        // if (Math.Abs(rb.velocity.y) > velocityThreshold && rb.velocity.y < 0){
-                        //     Debug.Log("Downward Velocity of: " + rb.velocity.y);
-                        // }
 
                         // ------------------------  SPEED OF LIGHT  ------------------------
 
                         // Only affect the object if it's moving:
                         if (Math.Abs(physObj.GetComponent<Rigidbody>().velocity.magnitude) > minVelocity.magnitude){
-                            // Debug.Log("GAMEOBJECT: " + physObj.name + " is moving at " + physObj.GetComponent<Rigidbody>().velocity.magnitude.ToString("F5"));
-                            // Get the rigidbody components of the physics objects:
                             // Get the rest values of the object from the ValuesAtRest script:
                             if (!rb.IsSleeping()){
                                 // Set mass to relativistic mass:
@@ -186,16 +186,19 @@ public class PhysicsController : MonoBehaviour
 
     // Return true if the object is travelling towards the player, false if away:
     public bool CheckDirection(GameObject obj) {
-        float distTemp = Vector3.Distance(playerRig.transform.position, obj.transform.position);
+        float distTemp = Vector3.Distance(playerRig.transform.position,
+            obj.transform.position);
+
+        float dist = dists[physObjects.IndexOf(obj)];
+        
         if (distTemp < dist) {
-            dist = distTemp;
+            dists[physObjects.IndexOf(obj)] = distTemp;
             return true;
         } else if (distTemp > dist) {
-            dist = distTemp;
+            dists[physObjects.IndexOf(obj)] = distTemp;
             return false;
         }
-        Debug.Log("Error in PhysicsController.CheckDirection - " + obj.name + " not moving towards nor away from the user.\nCurrent Dist: " + dist);
-        dist = 0;
+        dists[physObjects.IndexOf(obj)] = 0;
         return false;
     }
 

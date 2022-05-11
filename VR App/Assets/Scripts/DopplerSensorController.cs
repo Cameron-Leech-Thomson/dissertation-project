@@ -69,12 +69,9 @@ public class DopplerSensorController : MonoBehaviour
                     rends[i].GetPropertyBlock(mpb);
                     // Get the specular map from the material:
                     colours[i] = mpb.GetColor(specularID);
-                    Debug.Log("Colour " + colours[i].ToString("F3"));
 
                     float h, s, v = 0;
                     Color.RGBToHSV(colours[i], out h, out s, out v);
-
-                    Debug.Log("HUE " + h);
 
                     if (colours[i].r > 0.5f && h == 0){
                         h = 1f;
