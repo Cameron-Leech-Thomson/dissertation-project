@@ -1,5 +1,5 @@
 # COM3610 - Dissertation Project
-## Virtual Reality Physics Exploration Application
+## [Virtual Reality Physics Exploration Application](https://cameron-leech-thomson.github.io/blog/virtual-reality-development/)
 
 *Product created for Computer Science BSc Dissertation at the University of Sheffield.*
 
